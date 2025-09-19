@@ -1,17 +1,16 @@
-const Education = require('../models/Education');
+// controllers/educationController.js
+const Education = require("../models/Education");
 
-// Create
-exports.createEducation = async (req, res) => {
+exports.create = async (req, res) => {
   try {
     const education = await Education.create(req.body);
     res.status(201).json(education);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 };
 
-// Get All
-exports.getAllEducations = async (req, res) => {
+exports.getAll = async (req, res) => {
   try {
     const educations = await Education.findAll();
     res.json(educations);
@@ -20,38 +19,35 @@ exports.getAllEducations = async (req, res) => {
   }
 };
 
-// Get One
-exports.getEducationById = async (req, res) => {
+exports.getById = async (req, res) => {
   try {
     const education = await Education.findByPk(req.params.id);
-    if (!education) return res.status(404).json({ error: 'Education not found' });
+    if (!education) return res.status(404).json({ error: "Not found" });
     res.json(education);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-// Update
-exports.updateEducation = async (req, res) => {
+exports.update = async (req, res) => {
   try {
-    const education = await Education.findByPk(req.params.id);
-    if (!education) return res.status(404).json({ error: 'Education not found' });
-
-    await education.update(req.body);
-    res.json(education);
+    const [updated] = await Education.update(req.body, {
+      where: { id: req.params.id }
+    });
+    if (!updated) return res.status(404).json({ error: "Not found" });
+    res.json({ message: "Updated successfully" });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 };
 
-// Delete
-exports.deleteEducation = async (req, res) => {
+exports.remove = async (req, res) => {
   try {
-    const education = await Education.findByPk(req.params.id);
-    if (!education) return res.status(404).json({ error: 'Education not found' });
-
-    await education.destroy();
-    res.json({ message: 'Education deleted' });
+    const deleted = await Education.destroy({
+      where: { id: req.params.id }
+    });
+    if (!deleted) return res.status(404).json({ error: "Not found" });
+    res.json({ message: "Deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

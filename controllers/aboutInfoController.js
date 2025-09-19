@@ -1,11 +1,15 @@
-const AboutInfo = require('../models/AboutInfo');
+const AboutInfo = require("../models/AboutInfo");
+const aboutSchema = require("../validators/aboutValidator");
 
-exports.create = async (req, res) => {
+exports.create = async (req, res, next) => {
   try {
-    const about = await AboutInfo.create(req.body);
+    const { error, value } = aboutSchema.validate(req.formData);
+    if (error) return res.status(400).json({ error: error.details[0].message });
+
+    const about = await AboutInfo.create(value);
     res.status(201).json(about);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err); // send to global error handler
   }
 };
 

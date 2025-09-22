@@ -6,6 +6,6 @@ router.post("/", projectImageController.create);
 router.get("/", projectImageController.getAll);
 router.get("/:id", projectImageController.getById);
 router.put("/:id", projectImageController.update);
-router.delete("/:id", projectImageController.remove);
+router.delete("/:id", projectImageController.deleteById);
 
 module.exports = router;

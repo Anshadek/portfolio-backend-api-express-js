@@ -22,6 +22,8 @@ app.use('/api/about-info', require('./routes/aboutInfoRoutes'));
 app.use('/api/educations', require('./routes/educationRoutes'));
 app.use('/api/experiences', require('./routes/experienceRoutes'));
 app.use('/api/categories', require('./routes/portfolioCategoryRoutes'));
+app.use('/api/projects', require('./routes/projectRoutes'));
+app.use('/api/project-images', require('./routes/projectImageRoutes'));
 // app.use('/api/contact-settings', require('./routes/contactSettingRoutes'));
 // app.use('/api/educations', require('./routes/educationRoutes'));
 // app.use('/api/experiences', require('./routes/experienceRoutes'));

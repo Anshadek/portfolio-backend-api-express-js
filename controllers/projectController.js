@@ -1,23 +1,73 @@
 const Project = require('../models/Project');
-const ProjectImage = require('../models/ProjectImage');
 const PortfolioCategory = require('../models/PortfolioCategory');
+const { createProjectSchema, updateProjectSchema } = require('../validators/projectValidator');
 
-exports.createProject = async (req, res) => {
+// Create a new project
+exports.create = async (req, res) => {
   try {
+    const { error } = createProjectSchema.validate(req.body);
+    if (error) return res.status(400).json({ success: false, error: error.details[0].message });
+
     const project = await Project.create(req.body);
-    res.status(201).json(project);
+    res.status(201).json({ success: true, data: project });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
-exports.getAllProjects = async (req, res) => {
+// Update a project by ID
+exports.update = async (req, res) => {
+  try {
+    const { error } = updateProjectSchema.validate(req.body);
+    if (error) return res.status(400).json({ success: false, error: error.details[0].message });
+
+    const project = await Project.findByPk(req.params.id);
+    if (!project) return res.status(404).json({ success: false, message: 'Project not found' });
+
+    await project.update(req.body);
+    res.status(200).json({ success: true, data: project });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// Get all projects
+exports.getAll = async (req, res) => {
   try {
     const projects = await Project.findAll({
-      include: [PortfolioCategory, ProjectImage]
+      include: [{ model: PortfolioCategory, attributes: ['id', 'name'] }],
+      order: [['createdAt', 'DESC']]
     });
-    res.json(projects);
+    res.status(200).json({ success: true, data: projects });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// Get a project by ID
+exports.getById = async (req, res) => {
+  try {
+    const project = await Project.findByPk(req.params.id, {
+      include: [{ model: PortfolioCategory, attributes: ['id', 'name'] }]
+    });
+
+    if (!project) return res.status(404).json({ success: false, message: 'Project not found' });
+
+    res.status(200).json({ success: true, data: project });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// Delete a project by ID
+exports.deleteById = async (req, res) => {
+  try {
+    const project = await Project.findByPk(req.params.id);
+    if (!project) return res.status(404).json({ success: false, message: 'Project not found' });
+
+    await project.destroy();
+    res.status(200).json({ success: true, message: 'Project deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
   }
 };

@@ -1,22 +1,79 @@
-const ProjectImage = require('../models/ProjectImage');
+const ProjectImage = require("../models/ProjectImage");
+const Project = require("../models/Project");
+const { createProjectImageSchema, updateProjectImageSchema } = require("../validators/projectImageValidator");
 
-exports.createImage = async (req, res) => {
+// Create
+exports.create = async (req, res) => {
   try {
+    const { error } = createProjectImageSchema.validate(req.body, { abortEarly: false }); 
+    if (error) {
+      // Collect all error messages
+      const messages = error.details.map(err => err.message);
+      return res.status(400).json({ errors: messages });
+    }
+    const project = await Project.findByPk(req.body.project_id);
+    if (!project) return res.status(404).json({ success: false, message: "Project not found" });
+
     const image = await ProjectImage.create(req.body);
-    res.status(201).json(image);
+    res.status(201).json({ success: true, data: image });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
-exports.deleteImage = async (req, res) => {
+// Get All
+exports.getAll = async (req, res) => {
+  try {
+    const images = await ProjectImage.findAll({
+      include: [{ model: Project, attributes: ["id", "title"] }],
+      order: [["createdAt", "DESC"]]
+    });
+    res.status(200).json({ success: true, data: images });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// Get By Id
+exports.getById = async (req, res) => {
+  try {
+    const image = await ProjectImage.findByPk(req.params.id, {
+      include: [{ model: Project, attributes: ["id", "title"] }]
+    });
+
+    if (!image) return res.status(404).json({ success: false, message: "Project image not found" });
+
+    res.status(200).json({ success: true, data: image });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// Update
+exports.update = async (req, res) => {
+  try {
+    const { error } = updateProjectImageSchema.validate(req.body);
+    if (error) return res.status(400).json({ success: false, error: error.details[0].message });
+
+    const image = await ProjectImage.findByPk(req.params.id);
+    if (!image) return res.status(404).json({ success: false, message: "Project image not found" });
+
+    await image.update(req.body);
+    res.status(200).json({ success: true, data: image });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// Delete
+exports.deleteById = async (req, res) => {
   try {
     const image = await ProjectImage.findByPk(req.params.id);
-    if (!image) return res.status(404).json({ error: 'Image not found' });
+    if (!image) return res.status(404).json({ success: false, message: "Project image not found" });
 
     await image.destroy();
-    res.json({ message: 'Image deleted' });
+    res.status(200).json({ success: true, message: "Project image deleted successfully" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 };

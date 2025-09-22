@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const portfolioController = require("../controllers/portfolioCategoryController");
+const portfolioCategoryController = require("../controllers/portfolioCategoryController");
 
-router.post("/", portfolioController.create);
-router.get("/", portfolioController.getAll);
-router.get("/:id", portfolioController.getById);
-router.put("/:id", portfolioController.update);
-router.delete("/:id", portfolioController.remove);
+// Routes
+router.post("/", portfolioCategoryController.create);
+router.get("/", portfolioCategoryController.getAll);
+router.get("/:id", portfolioCategoryController.getById);
+router.delete("/:id", portfolioCategoryController.remove);
 
 module.exports = router;

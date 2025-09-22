@@ -1,9 +1,16 @@
 // controllers/educationController.js
 const Education = require("../models/Education");
+const educationSchema = require("../validators/educationValidator");
 
 exports.create = async (req, res) => {
   try {
-    const education = await Education.create(req.body);
+    const { error, value } = educationSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+      // Collect all error messages
+      const messages = error.details.map(err => err.message);
+      return res.status(400).json({ errors: messages });
+    }
+    const education = await Education.create(value);
     res.status(201).json(education);
   } catch (err) {
     res.status(500).json({ error: err.message });

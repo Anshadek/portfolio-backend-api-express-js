@@ -1,7 +1,7 @@
 const ProjectImage = require("../models/ProjectImage");
 const Project = require("../models/Project");
 const { createProjectImageSchema, updateProjectImageSchema } = require("../validators/projectImageValidator");
-
+const path = require("path");
 // Create
 exports.create = async (req, res) => {
   try {
@@ -27,14 +27,30 @@ exports.create = async (req, res) => {
 exports.getAll = async (req, res) => {
   try {
     const images = await ProjectImage.findAll({
-      include: [{ model: Project, attributes: ["id", "title"] }],
-      order: [["createdAt", "DESC"]]
+      include: [
+        {
+          model: Project,
+          as: "project",
+          attributes: ["id", "title"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
     });
-    res.status(200).json({ success: true, data: images });
+
+    const BASE_URL = `${req.protocol}://${req.get("host")}`;
+
+    const updatedImages = images.map((img) => ({
+      ...img.toJSON(),
+      image_path: `${BASE_URL}/uploads/project_images/${img.image_path}`, // 👈 public URL
+    }));
+
+    res.status(200).json({ success: true, data: updatedImages });
   } catch (err) {
+    console.error(err.message);
     res.status(500).json({ success: false, error: err.message });
   }
 };
+
 
 // Get By Id
 exports.getById = async (req, res) => {

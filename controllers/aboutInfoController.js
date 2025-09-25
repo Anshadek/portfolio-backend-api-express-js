@@ -3,8 +3,9 @@ const aboutSchema = require("../validators/aboutValidator");
 
 exports.create = async (req, res, next) => {
   try {
-    // Use req.formData which includes file info
-    const { error, value } = aboutSchema.validate(req.formData, { abortEarly: false });
+    // req.formData contains text fields + uploaded file names
+    const { error, value } = aboutSchema.validate(req.formData, { abortEarly: false, stripUnknown: true });
+
     if (error) {
       const errors = {};
       error.details.forEach((detail) => {
@@ -15,12 +16,13 @@ exports.create = async (req, res, next) => {
     }
 
     const about = await AboutInfo.create(value);
-    res.status(201).json(about);
+    res.status(201).json({ success: true, data: about });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     next(err);
   }
 };
+
 
 exports.getAll = async (req, res) => {
   try {
@@ -55,23 +57,23 @@ exports.getFirst = async (req, res) => {
 
 exports.update = async (req, res) => {
   try {
-   
-    const { error, value } = aboutSchema.validate(req.body, { abortEarly: false,stripUnknown: true });
+    const { error, value } = aboutSchema.validate(req.formData, { abortEarly: false, stripUnknown: true });
     if (error) {
       const errors = {};
       error.details.forEach((detail) => {
-        const field = detail.path[0]; // e.g., "description", "email"
+        const field = detail.path[0];
         errors[field] = detail.message;
       });
       return res.status(400).json({ errors });
     }
+
     const about = await AboutInfo.findByPk(req.params.id);
-    
-    if (!about) return res.status(404).json({ error: 'Not found' });
-   
-    await about.update(req.body);
-    res.json(about);
+    if (!about) return res.status(404).json({ error: "Not found" });
+
+    await about.update(value);
+    res.json({ success: true, data: about });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };

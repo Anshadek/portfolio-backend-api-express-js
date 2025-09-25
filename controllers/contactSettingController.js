@@ -6,22 +6,23 @@ module.exports = {
   // Create new contact setting
   create: async (req, res) => {
     try {
+
       // Validate with abortEarly: false to get all errors
       const { error, value } = contactSettingSchema.validate(req.body, { abortEarly: false });
-  
+
       if (error) {
         // Map all error messages into an array
         const errors = error.details.map(detail => detail.message);
         return res.status(400).json({ errors });
       }
-  
+
       const contact = await ContactSetting.create(value);
       res.status(201).json(contact);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
   },
-  
+
 
   // Get all contact settings
   getAll: async (req, res) => {
@@ -47,14 +48,16 @@ module.exports = {
   // Update contact setting by ID
   update: async (req, res) => {
     try {
-      const { error, value } = contactSettingSchema.validate(req.body);
+      //remove id,createdAt
+      delete req.formData.id;
+      delete req.formData.createdAt;
+      delete req.formData.updatedAt;
+      const { error, value } = contactSettingSchema.validate(req.formData, { abortEarly: false });
       if (error) return res.status(400).json({ error: error.details[0].message });
-
       const contact = await ContactSetting.findByPk(req.params.id);
       if (!contact) return res.status(404).json({ error: 'Contact setting not found' });
-
       await contact.update(value);
-      res.json(contact);
+      res.json({ success: true, data: contact });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
@@ -67,7 +70,7 @@ module.exports = {
       if (!contact) return res.status(404).json({ error: 'Contact setting not found' });
 
       await contact.destroy();
-      res.json({ message: 'Contact setting deleted successfully' });
+      res.json({ success: true, message: 'Contact setting deleted successfully' });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }

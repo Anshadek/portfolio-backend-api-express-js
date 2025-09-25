@@ -1,10 +1,13 @@
 const express = require('express');
 const sequelize = require('./config/db');
+const path = require("path")
 const errorHandler = require("./middlewares/errorHandler");
 require('dotenv').config();
 const cors = require("cors");
 
 const app = express();
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Enable CORS for all routes
 app.use(cors());

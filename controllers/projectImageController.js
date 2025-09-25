@@ -5,21 +5,23 @@ const { createProjectImageSchema, updateProjectImageSchema } = require("../valid
 // Create
 exports.create = async (req, res) => {
   try {
-    const { error } = createProjectImageSchema.validate(req.body, { abortEarly: false }); 
+    console.log(req.formData);
+    const { error } = createProjectImageSchema.validate(req.formData, { abortEarly: false });
     if (error) {
-      // Collect all error messages
       const messages = error.details.map(err => err.message);
       return res.status(400).json({ errors: messages });
     }
-    const project = await Project.findByPk(req.body.project_id);
+
+    const project = await Project.findByPk(req.formData.project_id); // <-- use formData
     if (!project) return res.status(404).json({ success: false, message: "Project not found" });
 
-    const image = await ProjectImage.create(req.body);
+    const image = await ProjectImage.create(req.formData);
     res.status(201).json({ success: true, data: image });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 };
+
 
 // Get All
 exports.getAll = async (req, res) => {

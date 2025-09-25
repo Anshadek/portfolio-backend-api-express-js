@@ -16,21 +16,23 @@ const formData = (folder, fields = []) => {
 
     uploader(req, res, (err) => {
       if (err) return res.status(400).json({ error: err.message });
-
+    
       req.formData = { ...req.body };
-
+    
       if (req.file) {
         req.formData[fields[0].name] = req.file.filename;
       }
-
+    
       if (req.files) {
         for (const field in req.files) {
           req.formData[field] = req.files[field].map((f) => f.filename);
         }
       }
-
+    
+      console.log("req.formData:", req.formData); // DEBUG
       next();
     });
+    
   };
 };
 

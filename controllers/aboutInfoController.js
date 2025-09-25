@@ -3,20 +3,22 @@ const aboutSchema = require("../validators/aboutValidator");
 
 exports.create = async (req, res, next) => {
   try {
-    const { error, value } = aboutSchema.validate(req.body, { abortEarly: false });
+    // Use req.formData which includes file info
+    const { error, value } = aboutSchema.validate(req.formData, { abortEarly: false });
     if (error) {
       const errors = {};
       error.details.forEach((detail) => {
-        const field = detail.path[0]; // e.g., "description", "email"
+        const field = detail.path[0];
         errors[field] = detail.message;
       });
       return res.status(400).json({ errors });
     }
+
     const about = await AboutInfo.create(value);
     res.status(201).json(about);
   } catch (err) {
     console.log(err);
-    next(err); // send to global error handler
+    next(err);
   }
 };
 

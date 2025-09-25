@@ -5,7 +5,9 @@ const experienceSchema = require('../validators/experinceValidator');
 // Create
 exports.create = async (req, res) => {
   try {
-    const { error, value } = experienceSchema.validate(req.body, { abortEarly: false });
+    
+    const { id, ...data } = req.body;
+    const { error, value } = experienceSchema.validate(data, { abortEarly: false });
     if (error) {
       // Collect all error messages
       const messages = error.details.map(err => err.message);

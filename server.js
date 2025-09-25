@@ -13,11 +13,11 @@ const User = require('./models/User');
 app.use(express.json());
 
 app.use('/api/about-info', require('./routes/aboutInfoRoutes'));
-app.use('/api/educations', require('./routes/educationRoutes'));
-app.use('/api/experiences', require('./routes/experienceRoutes'));
-app.use('/api/categories', require('./routes/portfolioCategoryRoutes'));
-app.use('/api/projects', require('./routes/projectRoutes'));
-app.use('/api/project-images', require('./routes/projectImageRoutes'));
+app.use('/api/education', require('./routes/educationRoutes'));
+app.use('/api/experience', require('./routes/experienceRoutes'));
+app.use('/api/category', require('./routes/portfolioCategoryRoutes'));
+app.use('/api/project', require('./routes/projectRoutes'));
+app.use('/api/project-image', require('./routes/projectImageRoutes'));
 app.use('/api/contact-settings', require('./routes/contactSettingRoutes'));
 
 app.use(errorHandler);

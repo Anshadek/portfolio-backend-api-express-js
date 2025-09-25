@@ -15,6 +15,7 @@ exports.create = async (req, res, next) => {
     const about = await AboutInfo.create(value);
     res.status(201).json(about);
   } catch (err) {
+    console.log(err);
     next(err); // send to global error handler
   }
 };

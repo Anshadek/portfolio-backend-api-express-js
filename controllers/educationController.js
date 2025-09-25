@@ -4,7 +4,9 @@ const educationSchema = require("../validators/educationValidator");
 
 exports.create = async (req, res) => {
   try {
-    const { error, value } = educationSchema.validate(req.body, { abortEarly: false });
+    console.log(req.body);
+    const { id, ...data } = req.body;
+    const { error, value } = educationSchema.validate(data, { abortEarly: false });
     if (error) {
       // Collect all error messages
       const messages = error.details.map(err => err.message);

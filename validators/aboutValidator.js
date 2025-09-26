@@ -99,7 +99,7 @@ const aboutSchema = Joi.object({
     }),
 
   brief_description: Joi.string()
-    .max(500)
+    .max(1000)
     .required()
     .messages({
       "string.base": "Brief description must be a text",

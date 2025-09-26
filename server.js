@@ -12,9 +12,11 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Enable CORS for all routes
 app.use(cors());
 const User = require('./models/User');
-
+const AboutInfo = require('./models/AboutInfo');
 app.use(express.json());
-
+//user home
+app.use('/api/user', require('./routes/user/homeRoutes'));
+app.use('/api/home', require('./routes/user/homeRoutes'));
 app.use('/api/about-info', require('./routes/aboutInfoRoutes'));
 app.use('/api/education', require('./routes/educationRoutes'));
 app.use('/api/experience', require('./routes/experienceRoutes'));

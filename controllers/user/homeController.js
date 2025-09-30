@@ -1,6 +1,11 @@
 const AboutInfo = require("../../models/AboutInfo");
 const Education = require("../../models/Education");
 const Experience = require("../../models/Experience");
+const Contact = require("../../models/ContactSetting");
+const PortfolioCategory = require("../../models/PortfolioCategory");
+const Project = require("../../models/Project");  
+const ProjectImage = require("../../models/ProjectImage");
+
 
 // get about data 
 exports.getAbout = async (req, res) => {
@@ -70,6 +75,68 @@ exports.getExperience = async (req, res) => {
     }
     res.json(experience);
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+// get contact data 
+exports.getContact = async (req, res) => {
+  try {
+    const contact = await Contact.findOne();
+    if (!contact) {
+      return res.status(404).json({ error: "Not found" });
+    }
+    res.json(contact);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+  //
+};
+
+// get portfolio data 
+exports.getPortfolioCategory = async (req, res) => {
+  try {
+    const BASE_URL = `${req.protocol}://${req.get("host")}`;
+
+    // Get categories
+    const categories = await PortfolioCategory.findAll({
+      attributes: ["id", "name"],
+    });
+
+    // Get projects with category + images
+    const projects = await Project.findAll({
+      include: [
+        {
+          model: PortfolioCategory,
+          attributes: ["id", "name"],
+        },
+        {
+          model:ProjectImage,
+          as: "images", // 👈 alias from association
+          attributes: ["id", "image_path", "image_title", "image_description"],
+        },
+      ],
+    });
+
+    // Map projects into portfolioItems
+    const portfolioItems = projects.map((p) => ({
+      title: p.title,
+      description: p.description,
+      images: p.images.map((img) => ({
+        url: `${BASE_URL}/uploads/project_images/${img.image_path}`,
+        title: img.image_title,
+        description: img.image_description,
+      })),
+      filter: `filter-${p.PortfolioCategory?.id || "uncategorized"}`,
+    }));
+
+    res.json({
+      categories,
+      items: portfolioItems,
+    });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };

@@ -25,6 +25,7 @@ app.use('/api/project', require('./routes/projectRoutes'));
 app.use('/api/project-image', require('./routes/projectImageRoutes'));
 app.use('/api/contact-settings', require('./routes/contactSettingRoutes'));
 
+
 app.use(errorHandler);
 
 // Test DB connection

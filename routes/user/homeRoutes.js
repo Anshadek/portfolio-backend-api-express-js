@@ -3,5 +3,9 @@ const router = express.Router();
 const homeController = require("../../controllers/user/homeController");
 console.log("route section");
 // store files inside "uploads/about/"
-router.get("/", homeController.getAbout);
+router.get("/about-info", homeController.getAbout);
+router.get("/skills-info", homeController.getSkill);
+router.get("/education-info", homeController.getEducation);
+router.get("/experience-info", homeController.getExperience);
+
 module.exports = router;

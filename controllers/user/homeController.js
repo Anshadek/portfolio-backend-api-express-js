@@ -5,7 +5,7 @@ const Contact = require("../../models/ContactSetting");
 const PortfolioCategory = require("../../models/PortfolioCategory");
 const Project = require("../../models/Project");  
 const ProjectImage = require("../../models/ProjectImage");
-
+const nodemailer = require("nodemailer");
 
 // get about data 
 exports.getAbout = async (req, res) => {
@@ -129,6 +129,10 @@ exports.getPortfolioCategory = async (req, res) => {
         description: img.image_description,
       })),
       filter: `filter-${p.PortfolioCategory?.id || "uncategorized"}`,
+      category: p.PortfolioCategory?.name || "uncategorized",
+      ProjectDate: p.project_date,
+      client: p.client,
+      project_url: p.project_url,
     }));
 
     res.json({
@@ -140,3 +144,44 @@ exports.getPortfolioCategory = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.sendMail = async (req, res) => {
+  try {
+    res.status(200).json({ success: "Message sent successfully!" });
+    const { name, email, subject, message } = req.body;
+
+    if (!name || !email || !subject || !message) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    // configure SMTP
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false, // true for 465, false for 587
+      auth: {
+        user: process.env.SMTP_USER, // your email
+        pass: process.env.SMTP_PASS, // app password or mail password
+      },
+    });
+
+    const mailOptions = {
+      from: `"Portfolio Contact" <${process.env.SMTP_USER}>`,
+      to: process.env.CONTACT_RECEIVER || process.env.SMTP_USER,
+      subject: `New Contact Message: ${subject}`,
+      html: `
+        <h3>New Message from Portfolio</h3>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Message:</strong><br/>${message}</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ success: "Message sent successfully!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to send message" });
+  }
+}

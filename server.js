@@ -15,6 +15,7 @@ const User = require('./models/User');
 const AboutInfo = require('./models/AboutInfo');
 app.use(express.json());
 //user home
+app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/user', require('./routes/user/homeRoutes'));
 app.use('/api/home', require('./routes/user/homeRoutes'));
 app.use('/api/about-info', require('./routes/aboutInfoRoutes'));

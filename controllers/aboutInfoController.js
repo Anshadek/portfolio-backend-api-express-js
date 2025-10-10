@@ -44,10 +44,11 @@ exports.getById = async (req, res) => {
 };
 
 exports.getFirst = async (req, res) => {
-  console.log("getFirst");
   try {
     const about = await AboutInfo.findOne();
-    console.log(about);
+    const BASE_URL = `${req.protocol}://${req.get("host")}`;
+    //addd image full path 
+    about['profile_photo'] = `${BASE_URL}/uploads/about/${about.profile_photo}`;
     if (!about) return res.status(404).json({ error: 'Not found' });
     res.json(about);
   } catch (err) {
